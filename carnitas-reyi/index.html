@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carnitas Reyi - Menú y Pedidos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <img src="logo.png" alt="Carnitas Reyi" class="logo">
+  </header>
+
+  <div id="ticker" class="ticker">¡Cargando anuncios del día!</div>
+
+  <div class="container">
+    <div class="offers-bar">
+      <h3>🔥 Oferta del Momento</h3>
+      <p id="oferta-texto">Cargando promociones...</p>
+    </div>
+
+    <h2>Nuestro Menú</h2>
+    <div id="menu-grid" class="grid" style="margin-top: 15px;"></div>
+
+    <h2 style="margin-top: 40px;">Elabora tu Pedido</h2>
+    <div class="card" style="margin-top: 15px;">
+      <form id="order-form">
+        <label>Tu Nombre:</label>
+        <input type="text" id="client-name" required placeholder="Ej. Juan Pérez">
+        
+        <label>Detalle de tu pedido:</label>
+        <textarea id="order-details" rows="3" required placeholder="Ej. 1/2 Kilo de Maciza y 3 tacos de Buche"></textarea>
+        
+        <button type="submit">Enviar Pedido a Cocina</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Reemplaza con tus llaves de Firebase Console
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "tu-proyecto.firebaseapp.com",
+      databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
+      projectId: "tu-proyecto",
+      storageBucket: "tu-proyecto.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Escuchar Menú en tiempo real
+    onValue(ref(db, 'menu'), (snapshot) => {
+      const data = snapshot.val();
+      const grid = document.getElementById('menu-grid');
+      grid.innerHTML = '';
+      if(data) {
+        Object.values(data).forEach(item => {
+          if(item.disponible) {
+            grid.innerHTML += `
+              <div class="card">
+                <h3>${item.nombre}</h3>
+                <p style="color:var(--text-muted);">${item.descripcion}</p>
+                <div class="price">$${item.precio} MXN</div>
+              </div>`;
+          }
+        });
+      }
+    });
+
+    // Escuchar Anuncios y Ofertas
+    onValue(ref(db, 'anuncios'), (snapshot) => {
+      const data = snapshot.val();
+      if(data) {
+        document.getElementById('ticker').innerText = data.ticker || '¡Bienvenidos a Carnitas Reyi!';
+        document.getElementById('oferta-texto').innerText = data.oferta || 'Sin ofertas por el momento.';
+      }
+    });
+
+    // Enviar Pedido
+    document.getElementById('order-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('client-name').value;
+      const detalle = document.getElementById('order-details').value;
+
+      push(ref(db, 'pedidos'), {
+        cliente: nombre,
+        detalle: detalle,
+        fecha: new Date().toLocaleTimeString(),
+        estado: 'Pendiente'
+      }).then(() => {
+        alert('¡Pedido enviado con éxito!');
+        document.getElementById('order-form').reset();
+      });
+    });
+  </script>
+</body>
+</html>

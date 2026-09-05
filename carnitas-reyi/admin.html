@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Carnitas Reyi</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div id="login-section" class="login-modal">
+    <img src="logo.png" alt="Carnitas Reyi" class="logo" style="display:block; margin:0 auto 15px;">
+    <h3 style="text-align: center; margin-bottom: 15px;">Acceso Administrativo</h3>
+    <input type="password" id="pass-input" placeholder="Contraseña">
+    <button id="login-btn">Entrar</button>
+  </div>
+
+  <div id="admin-panel" class="container" style="display: none;">
+    <header style="margin-bottom: 20px;">
+      <h1>Panel de Control en Tiempo Real</h1>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Agregar / Editar Platillo</h3>
+        <input type="text" id="item-nombre" placeholder="Nombre (ej. Taco de Buche)">
+        <input type="text" id="item-desc" placeholder="Descripción">
+        <input type="number" id="item-precio" placeholder="Precio MXN">
+        <button id="add-menu-btn">Publicar Platillo</button>
+      </div>
+
+      <div class="card">
+        <h3>Anuncios y Ofertas Express</h3>
+        <label>Barra Noticiosa (Ticker):</label>
+        <input type="text" id="ticker-input" placeholder="Ej. ¡Hoy aceptamos pagos con tarjeta!">
+        
+        <label>Oferta Flash:</label>
+        <input type="text" id="oferta-input" placeholder="Ej. 2x1 en Tacos de Maciza">
+        
+        <button id="update-announcements-btn">Actualizar Pantalla Cliente</button>
+      </div>
+    </div>
+
+    <h2 style="margin-top: 30px;">Pedidos en Vivo</h2>
+    <div id="pedidos-list" class="grid" style="margin-top: 15px;"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "tu-proyecto.firebaseapp.com",
+      databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
+      projectId: "tu-proyecto",
+      storageBucket: "tu-proyecto.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Validación de Clave
+    document.getElementById('login-btn').addEventListener('click', () => {
+      const pass = document.getElementById('pass-input').value;
+      if(pass === "29141916042") {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        initAdmin();
+      } else {
+        alert('Contraseña incorrecta');
+      }
+    });
+
+    function initAdmin() {
+      // Agregar Platillo
+      document.getElementById('add-menu-btn').addEventListener('click', () => {
+        const nombre = document.getElementById('item-nombre').value;
+        const descripcion = document.getElementById('item-desc').value;
+        const precio = document.getElementById('item-precio').value;
+
+        if(nombre && precio) {
+          push(ref(db, 'menu'), {
+            nombre, descripcion, precio, disponible: true
+          });
+          document.getElementById('item-nombre').value = '';
+          document.getElementById('item-desc').value = '';
+          document.getElementById('item-precio').value = '';
+        }
+      });
+
+      // Actualizar Ofertas/Ticker
+      document.getElementById('update-announcements-btn').addEventListener('click', () => {
+        set(ref(db, 'anuncios'), {
+          ticker: document.getElementById('ticker-input').value,
+          oferta: document.getElementById('oferta-input').value
+        });
+        alert('¡Publicado en tiempo real!');
+      });
+
+      // Escuchar Pedidos Entrantes
+      onValue(ref(db, 'pedidos'), (snapshot) => {
+        const list = document.getElementById('pedidos-list');
+        list.innerHTML = '';
+        const data = snapshot.val();
+        if(data) {
+          Object.entries(data).forEach(([id, pedido]) => {
+            list.innerHTML += `
+              <div class="card" style="border-left: 4px solid var(--accent);">
+                <h4>${pedido.cliente} (${pedido.fecha})</h4>
+                <p style="margin: 10px 0;">${pedido.detalle}</p>
+                <button onclick="completarPedido('${id}')">Marcar Entregado</button>
+              </div>`;
+          });
+        }
+      });
+    }
+
+    window.completarPedido = (id) => {
+      remove(ref(db, `pedidos/${id}`));
+    };
+  </script>
+</body>
+</html>

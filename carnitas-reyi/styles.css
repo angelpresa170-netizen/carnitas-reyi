@@ -1,0 +1,36 @@
+:root {
+  --primary: #9e1b1b;
+  --primary-dark: #630c0c;
+  --accent: #ff4d4d;
+  --bg: #0f0f11;
+  --card-bg: #1a1a1e;
+  --text: #f0f0f5;
+  --text-muted: #a0a0ab;
+  --border: #2a2a32;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; }
+
+header { background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(15,15,17,1) 100%); text-align: center; padding: 20px; border-bottom: 2px solid var(--primary); }
+.logo { max-width: 160px; height: auto; filter: drop-shadow(0 0 10px rgba(158,27,27,0.5)); }
+
+.ticker { background: var(--primary); color: white; padding: 10px; font-weight: bold; font-size: 0.95rem; text-align: center; }
+
+.container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+
+.offers-bar { background: var(--card-bg); border-left: 4px solid var(--accent); padding: 15px; margin-bottom: 25px; border-radius: 8px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; transition: transform 0.2s; }
+.card:hover { transform: translateY(-3px); }
+.card h3 { color: var(--text); margin-bottom: 8px; }
+.card .price { color: var(--accent); font-weight: bold; font-size: 1.2rem; margin: 10px 0; }
+
+button { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+button:hover { opacity: 0.9; }
+
+input, select, textarea { width: 100%; padding: 10px; background: #000; border: 1px solid var(--border); color: white; border-radius: 6px; margin-bottom: 12px; }
+
+.login-modal { max-width: 380px; margin: 80px auto; background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--primary); }

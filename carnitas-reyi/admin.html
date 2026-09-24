@@ -1,187 +1,92 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARMM Productos de Limpieza</title>
-<style>
-  * { box-sizing: border-box; }
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f9; }
-  header { background: #1a2b4c; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-  .slogan { font-size: 0.85em; color: #a0b2d6; }
-  .leyenda { background: #ffeb3b; padding: 8px 15px; text-align: center; font-weight: bold; font-size: 0.9em; color: #333; }
-  .container { padding: 15px; max-width: 1200px; margin: auto; }
-  .search-bar { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; margin-bottom: 20px; }
-  
-  /* Grid adaptativo para que no se deforme en celulares */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-  @media (min-width: 600px) {
-    .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-  }
-
-  .card { background: #fff; border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-  .card button { background: #00e699; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; color: #0b1329; margin-top: 10px; }
-  .modal { display: none; position: fixed; top: 0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
-  .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-  .modal-content input, .modal-content select { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #ccc; border-radius: 4px; }
-  .pwd-container { position: relative; }
-  .eye-icon { position: absolute; right: 10px; top: 12px; cursor: pointer; user-select: none; }
-  .user-btn, .cart-btn { background: #006699; color: white; border: none; padding: 8px 12px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-left: 5px; font-size: 0.85em; }
-  .review-card { background: #fff; border-left: 4px solid #00e699; padding: 10px; margin-top: 10px; font-style: italic; }
-  .btn-action { background: #1a2b4c; color: white; border: none; padding: 12px; border-radius: 4px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Tortas Ahogadas Los Tapatíos</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #121212; color: white; padding: 20px; }
+    .container { max-width: 600px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 8px; }
+    input, button { width: 100%; padding: 10px; margin: 8px 0; border-radius: 4px; border: none; }
+    input { background: #2a2a2a; color: white; }
+    button { background: #a80022; color: white; font-weight: bold; cursor: pointer; }
+    .product-list { margin-top: 20px; }
+    .item { background: #2a2a2a; padding: 10px; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+    .btn-del { background: #ff4444; width: auto; padding: 5px 10px; }
+  </style>
 </head>
 <body>
 
-<div class="leyenda">
-  Regístrate para realizar un pedido o realízalo directamente a nuestro <a href="https://wa.me/523351097726">WhatsApp</a>
-</div>
-
-<header>
-  <div>
-    <h1 style="margin:0; font-size:1.4em;">ARMM Productos de Limpieza</h1>
-    <div class="slogan">Ofrecerte todo para la limpieza y hasta la puerta de tu hogar</div>
-  </div>
-  <div>
-    <span id="userSection">
-      <button class="user-btn" onclick="abrirModal('modalRegistro')">Registrarse</button>
-      <button class="user-btn" onclick="abrirModal('modalLogin')">Iniciar Sesión</button>
-    </span>
-    <button class="cart-btn" onclick="abrirModal('modalCarrito')">Carrito (<span id="cartCount">0</span>)</button>
-  </div>
-</header>
-
 <div class="container">
-  <input type="text" class="search-bar" id="searchInput" placeholder="Buscar productos o categorías..." onkeyup="filtrarProductos()">
-  
-  <h2>Nuestros Productos</h2>
-  <div class="grid" id="productGrid"></div>
+  <h2>Administrador de Menú</h2>
+  <input type="text" id="nombre" placeholder="Nombre del platillo">
+  <input type="number" id="precio" placeholder="Precio ($)">
+  <button onclick="guardarProducto()">Agregar Platillo</button>
 
-  <hr style="margin-top: 40px;">
-  <h2>Sobre la Empresa</h2>
-  <p><strong>Propósito:</strong> Ofrecerte todo para la limpieza y hasta la puerta de tu hogar.</p>
-  <p>Tenemos más de 3 años trabajando para una limpieza mejor.</p>
-  <p><strong>Contacto Directo:</strong> WhatsApp: <a href="https://wa.me/523351097726">33 5109 7726</a> | Correo: armmproductosdelimpieza@gmail.com</p>
-  
-  <h3>Reseñas de Clientes</h3>
-  <div class="review-card">"Excelente servicio, todo llegó impecable hasta mi casa." - María G.</div>
-  <div class="review-card">"Los precios por mayoreo valen totalmente la pena." - Carlos M.</div>
+  <h3>Platillos en tiempo real</h3>
+  <div id="lista" class="product-list">Cargando...</div>
 </div>
 
-<!-- Modal Registro -->
-<div id="modalRegistro" class="modal">
-  <div class="modal-content">
-    <h3>Registro de Usuario</h3>
-    <input type="text" id="regNombre" placeholder="Nombre(s)">
-    <input type="text" id="regApellido" placeholder="Apellidos">
-    <input type="tel" id="regTel" placeholder="Teléfono">
-    <input type="text" id="regDir" placeholder="Dirección Completa">
-    <input type="email" id="regCorreo" placeholder="Correo electrónico">
-    <div class="pwd-container">
-      <input type="password" id="regPass" placeholder="Generar Contraseña *">
-      <span class="eye-icon" onclick="togglePass('regPass')">👁️</span>
-    </div>
-    <div class="pwd-container">
-      <input type="password" id="regPassConfirm" placeholder="Confirmar Contraseña *">
-      <span class="eye-icon" onclick="togglePass('regPassConfirm')">👁️</span>
-    </div>
-    <button class="btn-action" onclick="ejecutarRegistro()">Registrarse</button>
-    <button class="btn-action" style="background:#8a99ad;" onclick="cerrarModal('modalRegistro')">Cancelar</button>
-  </div>
-</div>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-<!-- Modal Login -->
-<div id="modalLogin" class="modal">
-  <div class="modal-content">
-    <h3>Iniciar Sesión</h3>
-    <input type="text" id="loginUser" placeholder="Correo o Teléfono">
-    <div class="pwd-container">
-      <input type="password" id="loginPass" placeholder="Contraseña">
-      <span class="eye-icon" onclick="togglePass('loginPass')">👁️</span>
-    </div>
-    <button class="btn-action" onclick="ejecutarLogin()">Acceder</button>
-    <button class="btn-action" style="background:#8a99ad;" onclick="cerrarModal('modalLogin')">Cancelar</button>
-  </div>
-</div>
+  // Reemplaza los siguientes datos con los de tu consola de Firebase
+  const firebaseConfig = {
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://TU_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "TU_PROJECT_ID",
+    storageBucket: "TU_PROJECT_ID.appspot.com",
+    messagingSenderId: "TU_SENDER_ID",
+    appId: "TU_APP_ID"
+  };
 
-<!-- Modal Carrito -->
-<div id="modalCarrito" class="modal">
-  <div class="modal-content">
-    <h3>Carrito de Compras</h3>
-    <div id="cartItemsContainer">El carrito está vacío.</div>
-    <p style="font-size: 1.1em; font-weight:bold; margin-top:15px;">Total Final: $<span id="cartTotal">0</span></p>
-    <button class="btn-action" style="background:#25d366;" onclick="procesarPago('SPEI')">PAGAR CON SPEI</button>
-    <button class="btn-action" style="background:#007bff;" onclick="procesarPago('RECIBIR')">PAGAR AL RECIBIR</button>
-    <button class="btn-action" style="background:#8a99ad;" onclick="cerrarModal('modalCarrito')">Cerrar</button>
-  </div>
-</div>
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const productosRef = ref(db, 'productos');
 
-<script>
-  function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
-  function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
-  function togglePass(id) {
-    const el = document.getElementById(id);
-    el.type = el.type === 'password' ? 'text' : 'password';
-  }
+  // Guardar platillo en la nube
+  window.guardarProducto = function() {
+    const nombre = document.getElementById('nombre').value;
+    const precio = document.getElementById('precio').value;
 
-  function cargarProductosWeb() {
-    const grid = document.getElementById('productGrid');
-    const data = localStorage.getItem('armm_productos');
-    grid.innerHTML = '';
+    if (!nombre || !precio) return alert("Llena todos los campos");
+
+    const nuevoRef = push(productosRef);
+    set(nuevoRef, { nombre: nombre, precio: precio })
+      .then(() => {
+        document.getElementById('nombre').value = '';
+        document.getElementById('precio').value = '';
+      });
+  };
+
+  // Escuchar cambios en vivo
+  onValue(productosRef, (snapshot) => {
+    const lista = document.getElementById('lista');
+    lista.innerHTML = '';
+    const data = snapshot.val();
+
     if (data) {
-      const productos = JSON.parse(data);
-      productos.forEach(p => {
-        let div = document.createElement('div');
-        div.className = 'card';
-        div.setAttribute('data-name', p.nombre.toLowerCase());
-        div.setAttribute('data-category', p.categoria.toLowerCase());
-        let detallePrecios = p.presentacion === 'Pieza'
-          ? `Menudeo: $${p.p1 || '-'} | Mayoreo: $${p.p20 || '-'}`
-          : `1L: $${p.p1 || '-'} | 5L: $${p.p5 || '-'} | 20L: $${p.p20 || '-'}`;
-        div.innerHTML = `
-          <h3>${p.nombre}</h3>
-          <p style="font-size: 0.85em; color: #666;"><strong>Cat:</strong> ${p.categoria}</p>
-          <p style="font-size: 0.85em; color: #333;">${detallePrecios}</p>
-          <button onclick="agregarAlCarrito('${p.nombre}')">Agregar al Carrito</button>
+      Object.keys(data).forEach(id => {
+        const item = data[id];
+        lista.innerHTML += `
+          <div class="item">
+            <span>${item.nombre} - $${item.precio}</span>
+            <button class="btn-del" onclick="eliminarProducto('${id}')">Eliminar</button>
+          </div>
         `;
-        grid.appendChild(div);
       });
     } else {
-      grid.innerHTML = '<p>No hay productos registrados.</p>';
-    }
-  }
-
-  // Escuchar cambios para actualización instantánea en el dispositivo
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'armm_productos') {
-      cargarProductosWeb();
+      lista.innerHTML = '<p>No hay platillos registrados.</p>';
     }
   });
 
-  function filtrarProductos() {
-    var q = document.getElementById('searchInput').value.toLowerCase();
-    var cards = document.querySelectorAll('#productGrid .card');
-    cards.forEach(card => {
-      var name = card.getAttribute('data-name');
-      var cat = card.getAttribute('data-category');
-      card.style.display = (name.includes(q) || cat.includes(q)) ? 'flex' : 'none';
-    });
-  }
-
-  let carrito = [];
-  function agregarAlCarrito(prod) {
-    carrito.push(prod);
-    document.getElementById('cartCount').innerText = carrito.length;
-    alert(prod + ' agregado al carrito.');
-  }
-
-  function procesarPago(tipo) {
-    if (carrito.length === 0) return alert("El carrito está vacío.");
-    let msg = encodeURIComponent(`Hola, quiero realizar un pedido con pago ${tipo}. Productos: ` + carrito.join(", "));
-    window.open(`https://wa.me/523351097726?text=${msg}`, '_blank');
-  }
-
-  window.onload = cargarProductosWeb;
+  // Eliminar producto de la nube
+  window.eliminarProducto = function(id) {
+    remove(ref(db, 'productos/' + id));
+  };
 </script>
 </body>
 </html>
